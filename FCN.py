@@ -30,7 +30,7 @@ class PPO(nn.Module):
                                    bias=True)
         self.diconv2_v = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(2, 2), dilation=2,
                                    bias=True)
-        self.value = nn.Conv2d(in_channels=64, out_channels=1, kernel_size=3, stride=1, padding=(1, 1), bias=True)
+        self.value = nn.Conv2d(in_channels=64, out_channels=3, kernel_size=3, stride=1, padding=(1, 1), bias=True)
 
         self.conv7_Wz = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(1, 1), bias=False)
         self.conv7_Uz = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(1, 1), bias=False)
