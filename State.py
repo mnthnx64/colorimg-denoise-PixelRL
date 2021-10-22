@@ -63,11 +63,14 @@ class State():
             The Color channel optimization should go here
             """
             if np.sum(act[i] == self.move_range + 6) > 0:
-                rb[i] = np.expand_dims(np.uint8(self.image[i].squeeze().astype(np.int8) * 1.05))
+                new_img = (self.image[i].squeeze()[:,:,0]*1.05, self.image[i].squeeze()[:,:,1], self.image[i].squeeze()[:,:,2]*1.05)
+                rb[i] = np.expand_dims(new_img, 0)
             if np.sum(act[i] == self.move_range + 7) > 0:
-                rg[i] = np.expand_dims(np.uint8(self.image[i].squeeze().astype(np.int8) * 1.05))
+                new_img = (self.image[i].squeeze()[:,:,0], self.image[i].squeeze()[:,:,1]*1.05, self.image[i].squeeze()[:,:,2]*1.05)
+                rg[i] = np.expand_dims(new_img, 0)
             if np.sum(act[i] == self.move_range + 8) > 0:
-                gb[i] = np.expand_dims(np.uint8(self.image[i].squeeze().astype(np.int8) * 1.05))
+                new_img = (self.image[i].squeeze()[:,:,0]*1.05, self.image[i].squeeze()[:,:,1]*1.05, self.image[i].squeeze()[:,:,2])
+                gb[i] = np.expand_dims(new_img,0)
     
         self.image = moved_image
         self.image = np.where(act[:,np.newaxis,:,:]==self.move_range, gaussian, self.image)
