@@ -47,7 +47,7 @@ class MiniBatchLoader(object):
     # test ok
     def load_data(self, path_infos, indices, augment=False):
         mini_batch_size = len(indices)
-        in_channels = 1
+        in_channels = 3
 
         if augment:
             xs = np.zeros((mini_batch_size, in_channels, self.crop_size, self.crop_size)).astype(np.float32)
@@ -75,7 +75,7 @@ class MiniBatchLoader(object):
                 x_offset = np.random.randint(rand_range_w)
                 y_offset = np.random.randint(rand_range_h)
                 img = img[y_offset:y_offset+self.crop_size, x_offset:x_offset+self.crop_size]
-                xs[i, 0, :, :] = (img/255).astype(np.float32)
+                xs[i, :, :, :] = (img/255).astype(np.float32)
 
         elif mini_batch_size == 1:
             for i, index in enumerate(indices):
@@ -87,7 +87,7 @@ class MiniBatchLoader(object):
 
             h, w = img.shape
             xs = np.zeros((mini_batch_size, in_channels, h, w)).astype(np.float32)
-            xs[0, 0, :, :] = (img/255).astype(np.float32)
+            xs[0, :, :, :] = (img/255).astype(np.float32)
 
         else:
             raise RuntimeError("mini batch size must be 1 when testing")

@@ -40,7 +40,7 @@ def main():
         IMAGE_DIR_PATH,
         img_size)
 
-    current_state = State.State((BATCH_SIZE, 1, 63, 63), MOVE_RANGE)
+    current_state = State.State((BATCH_SIZE, 3, 63, 63), MOVE_RANGE)
     agent = PixelWiseA3C_InnerState(model, optimizer, BATCH_SIZE, EPISODE_LEN, GAMMA)
 
     train_data_size = MiniBatchLoader.count_paths(TRAINING_DATA_PATH)
@@ -49,7 +49,7 @@ def main():
         r = indices[i_index: i_index + BATCH_SIZE]
         raw_x = mini_batch_loader.load_training_data(r)
         l = raw_x
-        raw_n = np.random.normal(0, sigma, (BATCH_SIZE, 1, 63, 63)).astype(l.dtype) / 255
+        raw_n = np.random.normal(0, sigma, (BATCH_SIZE, 3, 63, 63)).astype(l.dtype) / 255
         current_state.reset(raw_x, raw_n)
         reward = np.zeros(l.shape, l.dtype)
         sum_reward = 0
@@ -71,7 +71,7 @@ def main():
             if n_epi % 10 == 0:
                 print(action[10])
                 print(action_prob[10])
-                paint_amap(action[10])
+                # paint_amap(action[10])
 
             current_state.step(action, inner_state)
             reward = np.square(l - previous_image) * 255 - np.square(l - current_state.image) * 255

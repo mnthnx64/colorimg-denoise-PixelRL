@@ -81,7 +81,7 @@ class PixelWiseA3C_InnerState():
     def update(self, statevar):
         assert self.t_start < self.t
         if statevar is None:
-            R = torch.zeros(22, 1, 63, 63).cuda()
+            R = torch.zeros(22, 3, 63, 63).cuda()
         else:
             _, vout, _ = self.model.forward(statevar)
             R = vout.detach()

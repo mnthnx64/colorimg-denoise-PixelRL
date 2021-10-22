@@ -3,11 +3,11 @@ import cv2
 import os
 
 def add_noise(image):
-    img = cv2.imread(image).astype(int)
+    img = cv2.imread(image).astype(np.int8)
     row, col, ch = img.shape
     mean = 0
     target_noise = 10 ** (35 / 10)
-    gauss_noise = np.random.normal(mean, np.sqrt(target_noise), (row,col,ch)).astype(int)
+    gauss_noise = np.random.normal(mean, np.sqrt(target_noise), (row,col,ch)).astype(np.int8)
 
     # Implements a clipping function so pixel values don't roll over (e.g. 253 + 10 = 255)
     noisy = cv2.add(img, gauss_noise)
