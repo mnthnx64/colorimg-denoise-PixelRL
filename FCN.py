@@ -11,7 +11,7 @@ class PPO(nn.Module):
         super(PPO, self).__init__()
         self.action_n = Action_N
         self.conv = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=64, kernel_size=3, stride=1, padding=(1, 1), bias=True),
+            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=3, stride=1, padding=(1, 1), bias=True),
             nn.ReLU(),
             nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(2, 2), dilation=2, bias=True),
             nn.ReLU(),
