@@ -30,7 +30,7 @@ IMAGE_DIR_PATH = ".//"
 
 def main():
     model = PPO(N_ACTIONS).to(device)
-    model.load_state_dict(torch.load("./torch_initweight/sig25_gray.pth"))
+    # model.load_state_dict(torch.load("./torch_initweight/sig25_gray.pth"))
     optimizer = optim.Adam(model.parameters(), lr=LR)
     i_index = 0
 
