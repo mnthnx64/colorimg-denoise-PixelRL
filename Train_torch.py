@@ -16,7 +16,7 @@ MOVE_RANGE = 3
 EPISODE_LEN = 5
 MAX_EPISODE = 100000
 GAMMA = 0.95 
-N_ACTIONS = 9
+N_ACTIONS = 12
 BATCH_SIZE = 22
 DIS_LR = 3e-4
 LR = 1e-3
@@ -24,8 +24,8 @@ img_size = 63
 sigma = 25
 # TRAINING_DATA_PATH = "./train.txt"
 # TESTING_DATA_PATH = "./train.txt"
-TRAINING_DATA_PATH = "./BSD68.txt"
-TESTING_DATA_PATH = "./BSD68.txt"
+TRAINING_DATA_PATH = "./CBSD68.txt"
+TESTING_DATA_PATH = "./CBSD68.txt"
 IMAGE_DIR_PATH = ".//"
 
 def main():

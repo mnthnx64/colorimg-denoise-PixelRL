@@ -65,7 +65,7 @@ class PPO(nn.Module):
             m.bias.data = torch.ones(m.bias.data.size())
 
     def forward(self, x):
-        conv = self.conv(x[:,0:1,:,:])
+        conv = self.conv(x[:,0:3,:,:])
         p = self.diconv1_p(conv)
         p = F.relu(p)
         p = self.diconv2_p(p)

@@ -55,10 +55,10 @@ class MiniBatchLoader(object):
             for i, index in enumerate(indices):
                 path = path_infos[index]
                 
-                img = cv2.imread(path,0)
+                img = cv2.imread(path,1)
                 if img is None:
                     raise RuntimeError("invalid image: {i}".format(i=path))
-                h, w = img.shape
+                h, w, _ = img.shape
 
                 if np.random.rand() > 0.5:
                     img = np.fliplr(img)
@@ -75,7 +75,7 @@ class MiniBatchLoader(object):
                 x_offset = np.random.randint(rand_range_w)
                 y_offset = np.random.randint(rand_range_h)
                 img = img[y_offset:y_offset+self.crop_size, x_offset:x_offset+self.crop_size]
-                xs[i, :, :, :] = (img/255).astype(np.float32)
+                xs[i, :, :, :] = (img/255).astype(np.float32).reshape(3,self.crop_size,self.crop_size)
 
         elif mini_batch_size == 1:
             for i, index in enumerate(indices):
