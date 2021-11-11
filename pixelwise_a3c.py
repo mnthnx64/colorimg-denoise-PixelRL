@@ -19,7 +19,10 @@ class PixelWiseA3C_InnerState():
                  average_entropy_decay=0.999,
                  average_value_decay=0.999):
 
+        # Global shared model
         self.shared_model = model
+
+        # Thread specific model
         self.model = copy.deepcopy(self.shared_model)
 
         self.optimizer = optimizer
@@ -85,6 +88,7 @@ class PixelWiseA3C_InnerState():
         else:
             _, vout, _ = self.model.forward(statevar)
             R = vout.detach()
+
         pi_loss = 0
         v_loss = 0
 
@@ -159,6 +163,20 @@ class PixelWiseA3C_InnerState():
             statevar = state
             self.update(statevar)
 
+    def act(self, state, test=True):
+        with torch.no_grad():
+            statevar = torch.Tensor(state).cuda()
+            pout, vout, inner_state = self.model.forward(statevar)
+            pout = torch.clamp(pout, min=0, max=1)
 
+            p_trans = pout.permute([0, 2, 3, 1])
+            dist = Categorical(p_trans)
 
+            if test:
+                _, action = torch.max(pout, dim=1)
+            else:
+                action = dist.sample().detach()  # action
+
+            action_prob = pout.gather(1, action.unsqueeze(1))
+            return action.unsqueeze(1).detach().cpu(), action_prob.detach().cpu(), inner_state.detach().cpu()
 

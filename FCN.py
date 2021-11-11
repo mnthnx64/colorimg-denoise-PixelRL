@@ -65,19 +65,25 @@ class PPO(nn.Module):
             m.bias.data = torch.ones(m.bias.data.size())
 
     def forward(self, x):
+        # Calculate weights for sequential NN
         conv = self.conv(x[:,0:3,:,:])
+
+        # Calculate weights for policy network (Actor)
         p = self.diconv1_p(conv)
         p = F.relu(p)
         p = self.diconv2_p(p)
         p = F.relu(p)
+
+        # Gated Recurrent Units (GRU) logic
         GRU_in = p
         ht = x[:, -64:, :, :]
         z_t = torch.sigmoid(self.conv7_Wz(GRU_in) + self.conv7_Uz(ht))
         r_t = torch.sigmoid(self.conv7_Wr(GRU_in) + self.conv7_Ur(ht))
-        h_title_t = torch.tanh(self.conv7_W(GRU_in) + self.conv7_U(r_t * ht))
-        h_t = (1 - z_t) * ht + z_t * h_title_t
+        h_tilde_t = torch.tanh(self.conv7_W(GRU_in) + self.conv7_U(r_t * ht))
+        h_t = (1 - z_t) * ht + z_t * h_tilde_t
         policy = F.softmax(self.policy(h_t), dim=1)
 
+        # Calculate weights for value network (Critic)
         v = self.diconv1_v(conv)
         v = F.relu(v)
         v = self.diconv2_v(v)

@@ -5,11 +5,14 @@ import cv2
  
 class MiniBatchLoader(object):
  
-    def __init__(self, train_path, test_path, image_dir_path, crop_size):
+    def __init__(self, train_path, test_path, image_dir_path, crop_size, validation=False):
  
         # load data paths
-        self.training_path_infos = self.read_paths(train_path, image_dir_path)
-        self.testing_path_infos = self.read_paths(test_path, image_dir_path)
+        if not validation:
+            self.training_path_infos = self.read_paths(train_path, image_dir_path)
+            self.testing_path_infos = self.read_paths(test_path, image_dir_path)
+        else:
+            self.validation_infos = test_path
  
         self.crop_size = crop_size
  
@@ -43,6 +46,9 @@ class MiniBatchLoader(object):
  
     def load_testing_data(self, indices):
         return self.load_data(self.testing_path_infos, indices)
+
+    def load_validation_data(self):
+        return self.load_data(self.validation_infos, [])
  
     # test ok
     def load_data(self, path_infos, indices, augment=False):
@@ -58,7 +64,7 @@ class MiniBatchLoader(object):
                 img = cv2.imread(path,1)
                 if img is None:
                     raise RuntimeError("invalid image: {i}".format(i=path))
-                h, w, _ = img.shape
+                h, w, c = img.shape
 
                 if np.random.rand() > 0.5:
                     img = np.fliplr(img)
@@ -75,19 +81,36 @@ class MiniBatchLoader(object):
                 x_offset = np.random.randint(rand_range_w)
                 y_offset = np.random.randint(rand_range_h)
                 img = img[y_offset:y_offset+self.crop_size, x_offset:x_offset+self.crop_size]
-                xs[i, :, :, :] = (img/255).astype(np.float32).reshape(3,self.crop_size,self.crop_size)
 
-        elif mini_batch_size == 1:
-            for i, index in enumerate(indices):
-                path = path_infos[index]
-                
-                img = cv2.imread(path,0)
-                if img is None:
-                    raise RuntimeError("invalid image: {i}".format(i=path))
+                xs[i, :, :, :] = (img/255).astype(np.float32).reshape(c,self.crop_size,self.crop_size)
 
-            h, w = img.shape
-            xs = np.zeros((mini_batch_size, in_channels, h, w)).astype(np.float32)
-            xs[0, :, :, :] = (img/255).astype(np.float32)
+        elif mini_batch_size == 0:
+            xs = np.zeros((1, in_channels, self.crop_size, self.crop_size)).astype(np.float32)
+            img = cv2.imread(self.validation_infos,1)
+
+            # cv2.imshow('pre',img)
+
+            # oof = (img/255).astype(np.float32)
+            # unoof = (oof*255).astype(np.uint8)
+
+            # cv2.imshow('post',unoof)
+            # cv2.waitKey(0)
+            
+            if img is None:
+                raise RuntimeError("invalid image: {i}".format(i=self.validation_infos))
+
+            h, w, c = img.shape
+
+            rand_range_h = h-self.crop_size
+            rand_range_w = w-self.crop_size
+            x_offset = np.random.randint(rand_range_w)
+            y_offset = np.random.randint(rand_range_h)
+            img = img[y_offset:y_offset+self.crop_size, x_offset:x_offset+self.crop_size]
+
+            xs[0, :, :, :] = (img/255).astype(np.float32).reshape(c,self.crop_size,self.crop_size)
+
+            # cv2.imshow('post',(xs[0]*255).astype(np.uint8).reshape(63,63,3))
+            # cv2.waitKey(0)
 
         else:
             raise RuntimeError("mini batch size must be 1 when testing")
