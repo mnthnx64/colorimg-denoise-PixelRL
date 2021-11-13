@@ -12,11 +12,11 @@ import torch.optim as optim
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(1)
 
-MOVE_RANGE = 3 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
+MOVE_RANGE = 9 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
 EPISODE_LEN = 5
-MAX_EPISODE = 5000
+MAX_EPISODE = 1000
 GAMMA = 0.95 
-N_ACTIONS = 12
+N_ACTIONS = 18
 BATCH_SIZE = 32
 DIS_LR = 3e-4
 LR = 1e-3
@@ -60,7 +60,7 @@ def main():
             image = np.asanyarray(raw_x[10].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
             image = np.squeeze(image)
             cv2.imshow("rerr", image)
-            cv2.waitKey(1)
+            # cv2.waitKey(1)
 
         for t in range(EPISODE_LEN):
             if n_epi % 10 == 0:
@@ -68,7 +68,7 @@ def main():
                 image = np.asanyarray(current_state.image[10].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
                 image = np.squeeze(image)
                 cv2.imshow("rerr", image)
-                cv2.waitKey(1)
+                # cv2.waitKey(1)
 
             previous_image = np.clip(current_state.image.copy(), a_min=0., a_max=1.)
             action, inner_state, action_prob = agent.act_and_train(current_state.tensor, reward)
@@ -95,7 +95,7 @@ def main():
 
         print("train total reward {a}".format(a=sum_reward * 255))
 
-    torch.save(model.state_dict(),'./pixel_sig25_color.pth')
+    torch.save(model.state_dict(),'./pixel_sig25_color_individual_c.pth')
     
 def paint_amap(acmap):
     image = np.asanyarray(acmap.squeeze(), dtype=np.uint8)

@@ -12,7 +12,6 @@ class State():
         size = self.image.shape
         prev_state = np.zeros((size[0], 64, size[2], size[3]),dtype=np.float32)
         self.tensor = np.concatenate([self.image, prev_state], axis=1)
-        print()
 
     def set(self, x):
         self.image = x
@@ -21,18 +20,23 @@ class State():
     def step(self, act, inner_state):
 
         # Pixel value actions
-        # act values: 0-2
+        # act values: 0-8
+        # Mod 3 -> 0-2
         # Subtracting 1 -> -1 or 0 or +1
         act = act.numpy()
-        neutral = (self.move_range - 1)/2
+        neutral = (3 - 1)/2
         move = act.astype(np.float32)
-        move = (move - neutral)/255
+        move = (move % 3 - neutral)/255
 
         if self.image.shape[0] > 1:
-            moved_image = self.image + move[:,np.newaxis,:,:]
+            self.image[:,0,:,:] = np.where(act // 3 == 0, move, self.image[:,0,:,:]) # Blue only
+            self.image[:,1,:,:] = np.where(act // 3 == 1, move, self.image[:,1,:,:]) # Green only
+            self.image[:,2,:,:] = np.where(act // 3 == 2, move, self.image[:,2,:,:]) # Red only
         else:
-            moved_image = self.image + move
-
+            self.image[:,0,:,:] = np.where(act // 3 == 0, move, self.image[:,0,:,:])
+            self.image[:,1,:,:] = np.where(act // 3 == 1, move, self.image[:,1,:,:])
+            self.image[:,2,:,:] = np.where(act // 3 == 2, move, self.image[:,2,:,:])
+        
         gaussian = np.zeros(self.image.shape, self.image.dtype)
         gaussian2 = np.zeros(self.image.shape, self.image.dtype)
         bilateral = np.zeros(self.image.shape, self.image.dtype)
@@ -89,8 +93,6 @@ class State():
                 new_img[(0,1),:,:] = new_img[(0,1),:,:]*1.05
                 gb[i] = np.expand_dims(new_img,0)
                 # print('gb')
-    
-        self.image = moved_image
 
         if self.image.shape[0] > 1:
             self.image = np.where(act[:,np.newaxis,:,:]==self.move_range, gaussian, self.image)

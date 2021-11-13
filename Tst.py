@@ -15,7 +15,7 @@ MOVE_RANGE = 3 #number of actions that move the pixel values. e.g., when MOVE_RA
 EPISODE_LEN = 5
 MAX_EPISODE = 2500
 GAMMA = 0.95 
-N_ACTIONS = 12
+N_ACTIONS = 18
 LR = 1e-3
 IMG_SIZE = 70
 SIGMA = 25
@@ -24,7 +24,7 @@ IMAGE_DIR_PATH = ".//"
 IMG_PATH = "./CBSD68/original_png/0001.png"
 
 model = PPO(N_ACTIONS).to(device)
-model.load_state_dict(torch.load('./torch_pixel_model/pixel_sig25_color.pth'))
+model.load_state_dict(torch.load('./torch_pixel_model/pixel_sig25_color_individual_c.pth'))
 optimizer = optim.Adam(model.parameters(), lr=LR)
 agent = PixelWiseA3C_InnerState(model, optimizer, 1, EPISODE_LEN, GAMMA)
 
