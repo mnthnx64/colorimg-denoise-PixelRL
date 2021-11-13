@@ -19,6 +19,10 @@ class State():
         self.tensor[:, :self.image.shape[1], :, :] = self.image
 
     def step(self, act, inner_state):
+
+        # Pixel value actions
+        # act values: 0-2
+        # Subtracting 1 -> -1 or 0 or +1
         act = act.numpy()
         neutral = (self.move_range - 1)/2
         move = act.astype(np.float32)
@@ -40,30 +44,33 @@ class State():
         gb = np.zeros(self.image.shape, self.image.dtype)
 
         b, c, h, w = self.image.shape
-        for i in range(0, b): 
+        for i in range(0, b):
+            cv_dims = (h, w, c)
+            std_dims = (c, h, w)
+
             if np.sum(act[i] == self.move_range) > 0:
-                gaussian[i] = np.expand_dims(cv2.GaussianBlur(self.image[i].squeeze().reshape((63,63,3)).astype(np.float32), ksize=(5, 5),
-                                                              sigmaX=0.5), 0).reshape((3,63,63))
-                print("gaussian1")
+                gaussian[i] = np.expand_dims(cv2.GaussianBlur(self.image[i].squeeze().reshape(cv_dims).astype(np.float32), ksize=(5, 5),
+                                                              sigmaX=0.5), 0).reshape(std_dims)
+                # print("gaussian1")
             if np.sum(act[i] == self.move_range + 1) > 0:
-                bilateral[i] = np.expand_dims(cv2.bilateralFilter(self.image[i].squeeze().reshape((63,63,3)).astype(np.float32), d=5,
-                                                                  sigmaColor=0.1, sigmaSpace=5), 0).reshape((3,63,63))
-                print("bi1")
+                bilateral[i] = np.expand_dims(cv2.bilateralFilter(self.image[i].squeeze().reshape(cv_dims).astype(np.float32), d=5,
+                                                                  sigmaColor=0.1, sigmaSpace=5), 0).reshape(std_dims)
+                # print("bi1")
             if np.sum(act[i] == self.move_range + 2) > 0:
-                median[i] = np.expand_dims(cv2.medianBlur(self.image[i].squeeze().reshape((63,63,3)).astype(np.float32), ksize=5), 0).reshape((3,63,63))  # 5
-                print("median")
+                median[i] = np.expand_dims(cv2.medianBlur(self.image[i].squeeze().reshape(cv_dims).astype(np.float32), ksize=5), 0).reshape(std_dims)  # 5
+                # print("median")
             if np.sum(act[i] == self.move_range + 3) > 0:
-                gaussian2[i] = np.expand_dims(cv2.GaussianBlur(self.image[i].squeeze().reshape((63,63,3)).astype(np.float32), ksize=(5, 5),
-                                                               sigmaX=1.5), 0).reshape((3,63,63))
-                print("gaussian2")
+                gaussian2[i] = np.expand_dims(cv2.GaussianBlur(self.image[i].squeeze().reshape(cv_dims).astype(np.float32), ksize=(5, 5),
+                                                               sigmaX=1.5), 0).reshape(std_dims)
+                # print("gaussian2")
             if np.sum(act[i] == self.move_range + 4) > 0:
-                bilateral2[i] = np.expand_dims(cv2.bilateralFilter(self.image[i].squeeze().reshape((63,63,3)).astype(np.float32), d=5,
-                                                                   sigmaColor=1.0, sigmaSpace=5), 0).reshape((3,63,63))
-                print("bi2")
+                bilateral2[i] = np.expand_dims(cv2.bilateralFilter(self.image[i].squeeze().reshape(cv_dims).astype(np.float32), d=5,
+                                                                   sigmaColor=1.0, sigmaSpace=5), 0).reshape(std_dims)
+                # print("bi2")
             if np.sum(act[i] == self.move_range + 5) > 0:  # 7
                 box[i] = np.expand_dims(
-                    cv2.boxFilter(self.image[i].squeeze().reshape((63,63,3)).astype(np.float32), ddepth=-1, ksize=(5, 5)), 0).reshape((3,63,63))
-                print("box")
+                    cv2.boxFilter(self.image[i].squeeze().reshape(cv_dims).astype(np.float32), ddepth=-1, ksize=(5, 5)), 0).reshape(std_dims)
+                # print("box")
             """
             The Color channel optimization should go here
             """
@@ -71,17 +78,17 @@ class State():
                 new_img = self.image[i].squeeze()
                 new_img[(0,2),:,:] = new_img[(0,2),:,:]*1.05
                 rb[i] = np.expand_dims(new_img, 0)
-                print('rb')
+                # print('rb')
             if np.sum(act[i] == self.move_range + 7) > 0:
                 new_img = self.image[i].squeeze()
                 new_img[(1,2),:,:] = new_img[(1,2),:,:]*1.05
                 rg[i] = np.expand_dims(new_img, 0)
-                print('rg')
+                # print('rg')
             if np.sum(act[i] == self.move_range + 8) > 0:
                 new_img = self.image[i].squeeze()
                 new_img[(0,1),:,:] = new_img[(0,1),:,:]*1.05
                 gb[i] = np.expand_dims(new_img,0)
-                print('gb')
+                # print('gb')
     
         self.image = moved_image
 

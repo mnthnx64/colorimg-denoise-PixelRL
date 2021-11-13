@@ -11,15 +11,15 @@ from mini_batch_loader import MiniBatchLoader
 from pixelwise_a3c import PixelWiseA3C_InnerState
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-MOVE_RANGE = 3
+MOVE_RANGE = 3 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
 EPISODE_LEN = 5
 MAX_EPISODE = 2500
 GAMMA = 0.95 
 N_ACTIONS = 12
 LR = 1e-3
-IMG_SIZE = 63
+IMG_SIZE = 70
 SIGMA = 25
-CHANNELS = 3
+N_CHANNELS = 3
 IMAGE_DIR_PATH = ".//"
 IMG_PATH = "./CBSD68/original_png/0001.png"
 
@@ -31,7 +31,7 @@ agent = PixelWiseA3C_InnerState(model, optimizer, 1, EPISODE_LEN, GAMMA)
 
 def tst(model, agent):
     model.eval()
-    current_state = State((1, CHANNELS, IMG_SIZE, IMG_SIZE), move_range=MOVE_RANGE)
+    current_state = State((1, N_CHANNELS, IMG_SIZE, IMG_SIZE), move_range=MOVE_RANGE)
     mini_batch_loader = MiniBatchLoader(IMG_PATH, IMG_PATH, IMAGE_DIR_PATH, IMG_SIZE, True)
     sum_reward = 0
     
@@ -41,7 +41,7 @@ def tst(model, agent):
     # raw_x = cv2.cvtColor(raw_x, cv2.COLOR_RGB2GRAY)
     # raw_x = (raw_x/255).astype(np.float32).reshape(3,63,63)
 
-    # Create random noise for image (mean=0, gamma=25)
+    # Create random noise for image (mean=0, sigma=25)
     raw_n = np.random.normal(0, SIGMA, raw_x.shape).astype(raw_x.dtype)/255
 
     current_state.reset(raw_x,raw_n)
@@ -54,13 +54,13 @@ def tst(model, agent):
         reward = np.square(raw_x - previous_image)*255 - np.square(raw_x - current_state.image)*255
         sum_reward += np.mean(reward)*np.power(GAMMA,t)
 
-    original = np.asanyarray((raw_x[0]*255+0.5).reshape(63,63,3), dtype=np.uint8)
+    original = np.asanyarray((raw_x[0]*255+0.5).reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS), dtype=np.uint8)
     original = np.squeeze(original)
     cv2.imshow("Original", original)
     # cv2.waitKey(0)
 
     noisy = np.clip(raw_x + raw_n, a_min=0., a_max=1.)
-    noisy = np.asanyarray(noisy[0].reshape(63,63,3) * 255, dtype=np.uint8)
+    noisy = np.asanyarray(noisy[0].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
     noisy = np.squeeze(noisy)
     cv2.imshow("Noisy", noisy)
     # cv2.waitKey(0)
@@ -74,7 +74,7 @@ def tst(model, agent):
     # print(action_map[0])
     # print(action_map_prob[0])
 
-    corrected = np.asanyarray(current_state.image[0].reshape(63,63,3) * 255, dtype=np.uint8)
+    corrected = np.asanyarray(current_state.image[0].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
     corrected = np.squeeze(corrected)
     cv2.imshow("corrected", corrected)
     cv2.waitKey(0)

@@ -12,16 +12,17 @@ import torch.optim as optim
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(1)
 
-MOVE_RANGE = 3
+MOVE_RANGE = 3 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
 EPISODE_LEN = 5
-MAX_EPISODE = 2500
+MAX_EPISODE = 5000
 GAMMA = 0.95 
 N_ACTIONS = 12
-BATCH_SIZE = 22
+BATCH_SIZE = 32
 DIS_LR = 3e-4
 LR = 1e-3
-img_size = 63
-sigma = 25
+IMG_SIZE = 70
+SIGMA = 25
+N_CHANNELS = 3
 # TRAINING_DATA_PATH = "./train.txt"
 # TESTING_DATA_PATH = "./train.txt"
 TRAINING_DATA_PATH = "./CBSD68.txt"
@@ -38,9 +39,9 @@ def main():
         TRAINING_DATA_PATH,
         TESTING_DATA_PATH,
         IMAGE_DIR_PATH,
-        img_size)
+        IMG_SIZE)
 
-    current_state = State.State((BATCH_SIZE, 3, 63, 63), MOVE_RANGE)
+    current_state = State.State((BATCH_SIZE, N_CHANNELS, IMG_SIZE, IMG_SIZE), MOVE_RANGE)
     agent = PixelWiseA3C_InnerState(model, optimizer, BATCH_SIZE, EPISODE_LEN, GAMMA)
     train_data_size = MiniBatchLoader.count_paths(TRAINING_DATA_PATH)
     indices = np.random.permutation(train_data_size)
@@ -49,14 +50,14 @@ def main():
         r = indices[i_index: i_index + BATCH_SIZE]
         # Load images
         raw_x = mini_batch_loader.load_training_data(r)
-        # Create random noise for each image (mean=0, gamma=25)
-        raw_n = np.random.normal(0, sigma, raw_x.shape).astype(raw_x.dtype) / 255
+        # Create random noise for each image (mean=0, sigma=25)
+        raw_n = np.random.normal(0, SIGMA, raw_x.shape).astype(raw_x.dtype) / 255
         current_state.reset(raw_x, raw_n)
         reward = np.zeros(raw_x.shape, raw_x.dtype)
         sum_reward = 0
 
         if n_epi % 10 == 0:
-            image = np.asanyarray(raw_x[10].reshape(63,63,3) * 255, dtype=np.uint8)
+            image = np.asanyarray(raw_x[10].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
             image = np.squeeze(image)
             cv2.imshow("rerr", image)
             cv2.waitKey(1)
@@ -64,7 +65,7 @@ def main():
         for t in range(EPISODE_LEN):
             if n_epi % 10 == 0:
             #     # cv2.imwrite('./test_img/'+'ori%2d' % (t+c)+'.jpg', current_state.image[20].transpose(1, 2, 0) * 255)
-                image = np.asanyarray(current_state.image[10].reshape(63,63,3) * 255, dtype=np.uint8)
+                image = np.asanyarray(current_state.image[10].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
                 image = np.squeeze(image)
                 cv2.imshow("rerr", image)
                 cv2.waitKey(1)
