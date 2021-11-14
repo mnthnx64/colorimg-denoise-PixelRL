@@ -1,6 +1,6 @@
 -f https://download.pytorch.org/whl/torch_stable.html
 numpy
-opencv-python
+opencv-python-headless==4.2.0.32
 Pillow
 Flask
 itsdangerous
