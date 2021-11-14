@@ -4,4 +4,3 @@ Flask
 itsdangerous
 torch
 numpy
-matplotlib
