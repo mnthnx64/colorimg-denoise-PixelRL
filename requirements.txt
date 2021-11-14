@@ -1,4 +1,4 @@
-opencv-python-contrib
+opencv-cotrib-python
 Pillow
 Flask
 itsdangerous
