@@ -9,30 +9,29 @@ from torch.distributions import Categorical
 import torch.optim as optim
 from mini_batch_loader import MiniBatchLoader
 from pixelwise_a3c import PixelWiseA3C_InnerState
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-MOVE_RANGE = 3 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
-EPISODE_LEN = 5
-MAX_EPISODE = 2500
-GAMMA = 0.95 
-N_ACTIONS = 12
-LR = 1e-3
-IMG_SIZE = 70
-SIGMA = 25
-N_CHANNELS = 3
-IMAGE_DIR_PATH = ".//"
-IMG_PATH = "./CBSD68-dataset/CBSD68/original_png/0004.png"
-
-model = PPO(N_ACTIONS).to(device)
-model.load_state_dict(torch.load('./torch_pixel_model/pixel_sig25_color.pth',  map_location='cpu'))
-optimizer = optim.Adam(model.parameters(), lr=LR)
-agent = PixelWiseA3C_InnerState(model, optimizer, 1, EPISODE_LEN, GAMMA)
 
 
-def tst(model, agent):
+def predict(img):
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    MOVE_RANGE = 3 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
+    EPISODE_LEN = 5
+    MAX_EPISODE = 2500
+    GAMMA = 0.95 
+    N_ACTIONS = 12
+    LR = 1e-3
+    IMG_SIZE = 70
+    SIGMA = 25
+    N_CHANNELS = 3
+    IMAGE_DIR_PATH = ".//"
+    # IMG_PATH = "./CBSD68-dataset/CBSD68/original_png/0004.png"
+
+    model = PPO(N_ACTIONS).to(device)
+    model.load_state_dict(torch.load('./torch_pixel_model/pixel_sig25_color.pth',  map_location='cpu'))
+    optimizer = optim.Adam(model.parameters(), lr=LR)
+    agent = PixelWiseA3C_InnerState(model, optimizer, 1, EPISODE_LEN, GAMMA)
     model.eval()
     current_state = State((1, N_CHANNELS, IMG_SIZE, IMG_SIZE), move_range=MOVE_RANGE)
-    mini_batch_loader = MiniBatchLoader(IMG_PATH, IMG_PATH, IMAGE_DIR_PATH, IMG_SIZE, True)
+    mini_batch_loader = MiniBatchLoader(img, IMG_SIZE, True)
     sum_reward = 0
     
     # Load image
@@ -51,22 +50,19 @@ def tst(model, agent):
         reward = np.square(raw_x - previous_image)*255 - np.square(raw_x - current_state.image)*255
         sum_reward += np.mean(reward)*np.power(GAMMA,t)
 
-    
     original = np.asanyarray((raw_x*255), dtype=np.uint8)
     original = np.squeeze(original)
-    cv2.imshow("Original", mini_batch_loader.stitch_image(original))
 
     noisy = np.clip(raw_x + raw_n, a_min=0., a_max=1.)
     noisy = np.asanyarray(noisy * 255, dtype=np.uint8)
     noisy = np.squeeze(noisy)
-    cv2.imshow("Noisy", mini_batch_loader.stitch_image(noisy))
+    noisy =  mini_batch_loader.stitch_image(noisy)
 
     corrected = np.asanyarray(current_state.image * 255, dtype=np.uint8)
     corrected = np.squeeze(corrected)
-    cv2.imshow("corrected", mini_batch_loader.stitch_image(corrected))
-    cv2.waitKey(0)
+    corrected = mini_batch_loader.stitch_image(corrected)
 
-    print("test total reward {a}".format(a=sum_reward))
+    return {"total_reward": sum_reward, "prediction": corrected, "noisy": noisy}
 
 
 def paint_amap(acmap):
@@ -75,7 +71,7 @@ def paint_amap(acmap):
     plt.colorbar()
     plt.show()
 
-tst(model, agent)
+# tst(model, agent)
 
 
 

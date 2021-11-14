@@ -5,15 +5,8 @@ import math
  
 class MiniBatchLoader(object):
  
-    def __init__(self, train_path, test_path, image_dir_path, crop_size, validation=False):
- 
-        # load data paths
-        if not validation:
-            self.training_path_infos = self.read_paths(train_path, image_dir_path)
-            self.testing_path_infos = self.read_paths(test_path, image_dir_path)
-        else:
-            self.validation_infos = test_path
- 
+    def __init__(self, img, crop_size, validation=False):
+        self.img = img
         self.crop_size = crop_size
  
     # test ok
@@ -42,76 +35,43 @@ class MiniBatchLoader(object):
         return cs
  
     def load_training_data(self, indices):
-        return self.load_data(self.training_path_infos, indices, augment=True)
+        return self.load_data()
  
     def load_testing_data(self, indices):
-        return self.load_data(self.testing_path_infos, indices)
+        return self.load_data()
 
     def load_validation_data(self):
-        return self.load_data(self.validation_infos, [])
+        return self.load_data()
  
     # test ok
-    def load_data(self, path_infos, indices, augment=False):
-        mini_batch_size = len(indices)
+    def load_data(self):
         in_channels = 3
 
-        if augment:
-            xs = np.zeros((mini_batch_size, in_channels, self.crop_size, self.crop_size)).astype(np.float32)
-            
-            for i, index in enumerate(indices):
-                path = path_infos[index]
-                
-                img = cv2.imread(path,1)
-                if img is None:
-                    raise RuntimeError("invalid image: {i}".format(i=path))
-                h, w, c = img.shape
+        img = self.img
 
-                if np.random.rand() > 0.5:
-                    img = np.fliplr(img)
+        if img is None:
+            raise RuntimeError("invalid image")
 
-                if np.random.rand() > 0.5:
-                    angle = 10*np.random.rand()
-                    if np.random.rand() > 0.5:
-                        angle *= -1
-                    M = cv2.getRotationMatrix2D((w/2,h/2),angle,1)
-                    img = cv2.warpAffine(img,M,(w,h))
+        h, w, c = img.shape
 
-                rand_range_h = h-self.crop_size
-                rand_range_w = w-self.crop_size
-                x_offset = np.random.randint(rand_range_w)
-                y_offset = np.random.randint(rand_range_h)
-                img = img[y_offset:y_offset+self.crop_size, x_offset:x_offset+self.crop_size]
+        self.ratioh  = math.ceil(h/self.crop_size)
+        self.ratiow = math.ceil(w/self.crop_size)
 
-                xs[i, :, :, :] = (img/255).astype(np.float32).reshape(c,self.crop_size,self.crop_size)
+        self.extra_h = self.ratioh*self.crop_size - h
+        self.extra_w = self.ratiow*self.crop_size - w
 
-        elif mini_batch_size == 0:
-            img = cv2.imread(self.validation_infos,1)
+        xs = np.zeros((self.ratioh*self.ratiow, in_channels, self.crop_size, self.crop_size)).astype(np.float32)
 
-            if img is None:
-                raise RuntimeError("invalid image: {i}".format(i=self.validation_infos))
+        img_extrah = np.zeros(shape=(self.extra_h, w, 3))
+        img_extraw = np.zeros(shape=(h+self.extra_h, self.extra_w, 3))
 
-            h, w, c = img.shape
+        cut_img = np.concatenate((img,img_extrah),axis = 0)
+        cut_img = np.concatenate((cut_img,img_extraw),axis = 1)
 
-            self.ratioh  = math.ceil(h/self.crop_size)
-            self.ratiow = math.ceil(w/self.crop_size)
+        for i in range(self.ratiow):
+            for j in range(self.ratioh):
+                xs[j+self.ratioh*i, :, :, :] = (cut_img[0+j*self.crop_size :self.crop_size +j*self.crop_size ,0+i*self.crop_size :self.crop_size +i*self.crop_size ]/255).astype(np.float32).reshape(c,self.crop_size,self.crop_size)
 
-            self.extra_h = self.ratioh*self.crop_size - h
-            self.extra_w = self.ratiow*self.crop_size - w
-
-            xs = np.zeros((self.ratioh*self.ratiow, in_channels, self.crop_size, self.crop_size)).astype(np.float32)
-
-            img_extrah = np.zeros(shape=(self.extra_h, w, 3))
-            img_extraw = np.zeros(shape=(h+self.extra_h, self.extra_w, 3))
-
-            cut_img = np.concatenate((img,img_extrah),axis = 0)
-            cut_img = np.concatenate((cut_img,img_extraw),axis = 1)
-
-            for i in range(self.ratiow):
-                for j in range(self.ratioh):
-                    xs[j+self.ratioh*i, :, :, :] = (cut_img[0+j*self.crop_size :self.crop_size +j*self.crop_size ,0+i*self.crop_size :self.crop_size +i*self.crop_size ]/255).astype(np.float32).reshape(c,self.crop_size,self.crop_size)
-
-        else:
-            raise RuntimeError("mini batch size must be 1 when testing")
         return xs
 
     def stitch_image(self, batch):
