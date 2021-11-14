@@ -11,6 +11,7 @@ Class project for EEE 598 (Reninforcement Learning in Robotics)
 # Requirements and Dependencies
 - pytorch
 - python 3.5+
+- [CBSD Dataset](https://github.com/clausmichele/CBSD68-dataset)
 
 
 

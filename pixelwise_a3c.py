@@ -167,7 +167,7 @@ class PixelWiseA3C_InnerState():
 
     def act(self, state, test=True):
         with torch.no_grad():
-            statevar = torch.Tensor(state).cuda()
+            statevar = torch.Tensor(state)
             pout, vout, inner_state = self.model.forward(statevar)
             pout = torch.clamp(pout, min=0, max=1)
 
