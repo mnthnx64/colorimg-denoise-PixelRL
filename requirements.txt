@@ -1,0 +1,10 @@
+opencv-python-contrib
+Pillow
+Flask
+itsdangerous
+Jinja2
+MarkupSafe
+Werkzeug
+torch
+numpy
+matplotlib
