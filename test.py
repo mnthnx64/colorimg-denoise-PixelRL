@@ -4,7 +4,6 @@ import numpy as np
 import cv2
 from FCN import PPO
 from State import State
-import matplotlib.pyplot as plt
 from torch.distributions import Categorical
 import torch.optim as optim
 from mini_batch_loader import MiniBatchLoader
@@ -63,25 +62,3 @@ def predict(img):
     corrected = mini_batch_loader.stitch_image(corrected)
 
     return {"total_reward": sum_reward, "prediction": corrected, "noisy": noisy}
-
-
-def paint_amap(acmap):
-    image = np.asanyarray(acmap.squeeze(), dtype=np.uint8)
-    plt.imshow(image,  vmin=1, vmax=9)
-    plt.colorbar()
-    plt.show()
-
-# tst(model, agent)
-
-
-
-
-
-
-
-
-
-
-
-
-

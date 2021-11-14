@@ -7,7 +7,6 @@ import State as State
 from pixelwise_a3c import *
 from FCN import *
 from mini_batch_loader import MiniBatchLoader
-import matplotlib.pyplot as plt
 import torch.optim as optim
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(1)
@@ -97,13 +96,5 @@ def main():
 
     torch.save(model.state_dict(),'./pixel_sig25_color.pth')
     
-def paint_amap(acmap):
-    image = np.asanyarray(acmap.squeeze(), dtype=np.uint8)
-    # print(image)
-    plt.imshow(image, vmin=1, vmax=9)
-    plt.colorbar()
-    plt.pause(1)
-    # plt.show()
-    plt.close()
 if __name__ == '__main__':
     main()
