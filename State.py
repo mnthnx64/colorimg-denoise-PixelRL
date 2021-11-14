@@ -27,10 +27,10 @@ class State():
         move = act.astype(np.float32)
         move = (move - neutral)/255
 
-        # if self.image.shape[0] > 1:
-        #     moved_image = self.image + move[:,np.newaxis,:,:]
-        # else:
-        moved_image = self.image 
+        if self.image.shape[0] > 1:
+            moved_image = self.image + move[:,np.newaxis,:,:]
+        else:
+            moved_image = self.image 
 
         gaussian = np.zeros(self.image.shape, self.image.dtype)
         gaussian2 = np.zeros(self.image.shape, self.image.dtype)
@@ -89,7 +89,7 @@ class State():
                 gb[i] = np.expand_dims(new_img,0)
                 # print('gb')
     
-        # self.image = moved_image
+        self.image = moved_image
 
         if self.image.shape[0] > 1:
             self.image = np.where(act[:,np.newaxis,:,:]==self.move_range, gaussian, self.image)
