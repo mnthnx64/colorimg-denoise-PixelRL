@@ -95,7 +95,7 @@ def main():
 
         print("train total reward {a}".format(a=sum_reward * 255))
 
-    torch.save(model.state_dict(),'./pixel_sig25_color.pth')
+    torch.save(model.state_dict(),'./torch_pixel_model/pixel_sig25_color.pth')
     
 def paint_amap(acmap):
     image = np.asanyarray(acmap.squeeze(), dtype=np.uint8)
