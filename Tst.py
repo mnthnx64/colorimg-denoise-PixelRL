@@ -11,7 +11,7 @@ from mini_batch_loader import MiniBatchLoader
 from pixelwise_a3c import PixelWiseA3C_InnerState
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-MOVE_RANGE = 3 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
+MOVE_RANGE = 9 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
 EPISODE_LEN = 5
 MAX_EPISODE = 2500
 GAMMA = 0.95 

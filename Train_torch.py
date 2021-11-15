@@ -14,7 +14,7 @@ torch.manual_seed(1)
 
 MOVE_RANGE = 9 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
 EPISODE_LEN = 5
-MAX_EPISODE = 1000
+MAX_EPISODE = 5000
 GAMMA = 0.95 
 N_ACTIONS = 18
 BATCH_SIZE = 32
