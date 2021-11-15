@@ -1,11 +1,12 @@
 import requests
 import cv2
+import base64
 
 BASE_IP = 'http://127.0.0.1:5000/'
 url = 'post_image'
 
-img = cv2.imread('CBSD68-dataset/CBSD68/original_png/0005.png')
-_, data = cv2.imencode('.png',img)
+img = cv2.imread('/Users/mx98/workspace/rlr/project/Pytorch-pixelRL/BSD68/test001.png',1)
+_, data = cv2.imencode('.jpg',img)
 
-response = requests.post(BASE_IP + url, data=data.tobytes())
+response = requests.post(BASE_IP + url, data=base64.b64encode(data))
 print(response.json())

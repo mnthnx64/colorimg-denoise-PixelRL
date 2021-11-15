@@ -21,10 +21,13 @@ def root():
 def post_image():
     try:
         req_data = request
-        nparr = np.frombuffer(req_data.data, np.uint8)
+        base64Un = req_data.data[req_data.data.find(b'/9'):]
+        tempAb = base64.b64decode(base64Un)
+        nparr = np.frombuffer(tempAb, np.uint8)
         img = cv2.imdecode(nparr,cv2.IMREAD_COLOR)
+        # cv2.imshow("Hee", img)
         resp = predict(img)
-
+        
         prediction = Image.fromarray(resp["prediction"].astype("uint8"))
         prediction_rawBytes = io.BytesIO()
         prediction.save(prediction_rawBytes, "JPEG")
@@ -52,4 +55,4 @@ def post_image():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run()
