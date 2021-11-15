@@ -4,6 +4,7 @@ import numpy as np
 import os, io, base64
 from test import predict
 from PIL import Image
+import imutils
 
 app = Flask(__name__)
 
@@ -26,7 +27,7 @@ def post_image():
         nparr = np.frombuffer(tempAb, np.uint8)
         img = cv2.imdecode(nparr,cv2.IMREAD_COLOR)
         # cv2.imshow("Hee", img)
-        resp = predict(img)
+        resp = predict(imutils.resize(img, height = 140))
         
         prediction = Image.fromarray(resp["prediction"].astype("uint8"))
         prediction_rawBytes = io.BytesIO()
@@ -55,4 +56,4 @@ def post_image():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run()
