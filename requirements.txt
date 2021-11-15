@@ -4,5 +4,6 @@ imutils
 opencv-python-headless
 Pillow
 Flask
+flask_cors
 itsdangerous
 torch==1.10.0+cpu

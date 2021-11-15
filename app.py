@@ -5,18 +5,22 @@ import os, io, base64
 from test import predict
 from PIL import Image
 import imutils
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/")
 def root():
-    return jsonify({
+    response =  jsonify({
         "Project": "Color Image Denoising using PixelRL",
         "Authors": "Mathan CS, Mark McMillian, Gilles Aye",
         "University": "Arizona State",
         "Class": "EEE 598: Reinforcement Learning",
         "Working": "200"
     })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 @app.route("/post_image", methods = ['POST'])
 def post_image():
@@ -46,11 +50,15 @@ def post_image():
             "prediction": str(prediction_base64),
             "noisy": str(noisy_base64)
         }
-        return jsonify(payload)
+        response = jsonify(payload)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
     except Exception as e:
         print(e)
-        return jsonify({"Error":"Error! Something went wrong."})
+        response = jsonify({"Error":"Error! Something went wrong."})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
   
 
 
