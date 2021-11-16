@@ -86,17 +86,17 @@ class State():
                 new_img = self.image[i].squeeze()
                 new_img[(0,2),:,:] = new_img[(0,2),:,:]*1.05
                 rb[i] = np.expand_dims(new_img, 0)
-                # print('rb')
+                print('rb')
             if np.sum(act[i] == self.move_range + 7) > 0:
                 new_img = self.image[i].squeeze()
                 new_img[(1,2),:,:] = new_img[(1,2),:,:]*1.05
                 rg[i] = np.expand_dims(new_img, 0)
-                # print('rg')
+                print('rg')
             if np.sum(act[i] == self.move_range + 8) > 0:
                 new_img = self.image[i].squeeze()
                 new_img[(0,1),:,:] = new_img[(0,1),:,:]*1.05
                 gb[i] = np.expand_dims(new_img,0)
-                # print('gb')
+                print('gb')
 
         if self.image.shape[0] > 1:
             self.image = np.where(act[:,np.newaxis,:,:]==self.move_range, gaussian, self.image)

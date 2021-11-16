@@ -21,7 +21,7 @@ BATCH_SIZE = 32
 DIS_LR = 3e-4
 LR = 1e-3
 IMG_SIZE = 70
-SIGMA = 25
+SIGMA = 50
 N_CHANNELS = 3
 # TRAINING_DATA_PATH = "./train.txt"
 # TESTING_DATA_PATH = "./train.txt"
@@ -95,7 +95,7 @@ def main():
 
         print("train total reward {a}".format(a=sum_reward * 255))
 
-    torch.save(model.state_dict(),'./pixel_sig25_color_individual_c.pth')
+    torch.save(model.state_dict(),f'./torch_pixel_model/pixel_sig{SIGMA}_color_individual_c.pth')
     
 def paint_amap(acmap):
     image = np.asanyarray(acmap.squeeze(), dtype=np.uint8)
