@@ -48,7 +48,8 @@ def post_image():
         payload = {
             "total_reward": resp["total_reward"],
             "prediction": str(prediction_base64),
-            "noisy": str(noisy_base64)
+            "noisy": str(noisy_base64),
+            "psnr": resp["psnr"]
         }
         response = jsonify(payload)
         response.headers.add('Access-Control-Allow-Origin', '*')

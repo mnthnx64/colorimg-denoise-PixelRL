@@ -61,4 +61,9 @@ def predict(img):
     corrected = np.squeeze(corrected)
     corrected = mini_batch_loader.stitch_image(corrected)
 
-    return {"total_reward": sum_reward, "prediction": cv2.cvtColor(corrected, cv2.COLOR_BGR2RGB) , "noisy": cv2.cvtColor(noisy, cv2.COLOR_BGR2RGB) }
+    return {
+        "total_reward": sum_reward, 
+        "prediction": cv2.cvtColor(corrected, cv2.COLOR_BGR2RGB) , 
+        "noisy": cv2.cvtColor(noisy, cv2.COLOR_BGR2RGB),
+        "psnr": cv2.PSNR(img, corrected)
+    }
