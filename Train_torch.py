@@ -14,7 +14,7 @@ torch.manual_seed(1)
 
 MOVE_RANGE = 3 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
 EPISODE_LEN = 5
-MAX_EPISODE = 5000
+MAX_EPISODE = 30000
 GAMMA = 0.95 
 N_ACTIONS = 12
 BATCH_SIZE = 32
@@ -25,9 +25,9 @@ SIGMA = 25
 N_CHANNELS = 3
 # TRAINING_DATA_PATH = "./train.txt"
 # TESTING_DATA_PATH = "./train.txt"
-TRAINING_DATA_PATH = "./CBSD68.txt"
-TESTING_DATA_PATH = "./CBSD68.txt"
-IMAGE_DIR_PATH = ".//"
+TRAINING_DATA_PATH = "./waterloo.txt"
+TESTING_DATA_PATH = "./waterloo.txt"
+IMAGE_DIR_PATH = "/home/mcsatish/workspace/waterloo/exploration_database_and_code/pristine_images"
 
 def main():
     model = PPO(N_ACTIONS).to(device)
@@ -59,24 +59,19 @@ def main():
         if n_epi % 10 == 0:
             image = np.asanyarray(raw_x[10].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
             image = np.squeeze(image)
-            cv2.imshow("rerr", image)
-            cv2.waitKey(1)
+            # cv2.imshow("rerr", image)
+            # cv2.waitKey(1)
 
         for t in range(EPISODE_LEN):
             if n_epi % 10 == 0:
             #     # cv2.imwrite('./test_img/'+'ori%2d' % (t+c)+'.jpg', current_state.image[20].transpose(1, 2, 0) * 255)
                 image = np.asanyarray(current_state.image[10].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
                 image = np.squeeze(image)
-                cv2.imshow("rerr", image)
-                cv2.waitKey(1)
+                # cv2.imshow("rerr", image)
+                # cv2.waitKey(1)
 
             previous_image = np.clip(current_state.image.copy(), a_min=0., a_max=1.)
             action, inner_state, action_prob = agent.act_and_train(current_state.tensor, reward)
-
-            if n_epi % 10 == 0:
-                print(action[10])
-                print(action_prob[10])
-                # paint_amap(action[10])
 
             current_state.step(action, inner_state)
             reward = np.square(raw_x - previous_image) * 255 - np.square(raw_x - current_state.image) * 255
@@ -97,13 +92,6 @@ def main():
 
     torch.save(model.state_dict(),'./torch_pixel_model/pixel_sig25_color.pth')
     
-def paint_amap(acmap):
-    image = np.asanyarray(acmap.squeeze(), dtype=np.uint8)
-    # print(image)
-    plt.imshow(image, vmin=1, vmax=9)
-    plt.colorbar()
-    plt.pause(1)
-    # plt.show()
-    plt.close()
+
 if __name__ == '__main__':
     main()
