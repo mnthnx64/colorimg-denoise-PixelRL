@@ -9,8 +9,6 @@ import torch
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(1)
 
-BATCH_SIZE = 32
-
 class PixelWiseA3C_InnerState():
 
     def __init__(self, model, optimizer, batch_size, t_max, gamma, beta=1e-2,
@@ -86,7 +84,7 @@ class PixelWiseA3C_InnerState():
     def update(self, statevar):
         assert self.t_start < self.t
         if statevar is None:
-            R = torch.zeros(BATCH_SIZE, 3, 70, 70).cuda()
+            R = torch.zeros(self.batch_size, 3, 70, 70).cuda()
         else:
             _, vout, _ = self.model.forward(statevar)
             R = vout.detach()

@@ -6,7 +6,7 @@ import math
 class TestBatchLoader(object):
  
     def __init__(self, img, crop_size, validation=False):
-        self.img = img
+        self.img = img = cv2.imread(img,1)
         self.crop_size = crop_size
  
     # test ok

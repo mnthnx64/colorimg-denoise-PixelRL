@@ -12,11 +12,11 @@ import torch.optim as optim
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(1)
 
-MOVE_RANGE = 9 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
+MOVE_RANGE = 1 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
 EPISODE_LEN = 5
 MAX_EPISODE = 5000
 GAMMA = 0.95 
-N_ACTIONS = 18
+N_ACTIONS = 16
 BATCH_SIZE = 32
 DIS_LR = 3e-4
 LR = 1e-3
@@ -96,6 +96,7 @@ def main():
         print("train total reward {a}".format(a=sum_reward * 255))
 
     torch.save(model.state_dict(),f'./torch_pixel_model/pixel_sig{SIGMA}_color_individual_c.pth')
+    print(f'Saved model to ./torch_pixel_model/pixel_sig{SIGMA}_color_individual_c.pth')
     
 def paint_amap(acmap):
     image = np.asanyarray(acmap.squeeze(), dtype=np.uint8)
