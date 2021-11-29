@@ -14,20 +14,20 @@ torch.manual_seed(1)
 
 MOVE_RANGE = 1 #number of actions that move the pixel values. e.g., when MOVE_RANGE=3, there are three actions: pixel_value+=1, +=0, -=1.
 EPISODE_LEN = 5
-MAX_EPISODE = 5000
+MAX_EPISODE = 20000
 GAMMA = 0.95 
-N_ACTIONS = 16
+N_ACTIONS = 9
 BATCH_SIZE = 32
 DIS_LR = 3e-4
 LR = 1e-3
 IMG_SIZE = 70
-SIGMA = 50
+SIGMA = 25
 N_CHANNELS = 3
 # TRAINING_DATA_PATH = "./train.txt"
 # TESTING_DATA_PATH = "./train.txt"
-TRAINING_DATA_PATH = "./CBSD68.txt"
-TESTING_DATA_PATH = "./CBSD68.txt"
-IMAGE_DIR_PATH = ".//"
+TRAINING_DATA_PATH = "./waterloo.txt"
+TESTING_DATA_PATH = "./waterloo.txt"
+IMAGE_DIR_PATH = "/home/mcsatish/workspace/waterloo/exploration_database_and_code/pristine_images"
 
 def main():
     model = PPO(N_ACTIONS).to(device)
@@ -59,7 +59,7 @@ def main():
         if n_epi % 10 == 0:
             image = np.asanyarray(raw_x[10].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
             image = np.squeeze(image)
-            cv2.imshow("rerr", image)
+            # cv2.imshow("rerr", image)
             # cv2.waitKey(1)
 
         for t in range(EPISODE_LEN):
@@ -67,7 +67,7 @@ def main():
             #     # cv2.imwrite('./test_img/'+'ori%2d' % (t+c)+'.jpg', current_state.image[20].transpose(1, 2, 0) * 255)
                 image = np.asanyarray(current_state.image[10].reshape(IMG_SIZE,IMG_SIZE,N_CHANNELS) * 255, dtype=np.uint8)
                 image = np.squeeze(image)
-                cv2.imshow("rerr", image)
+                # cv2.imshow("rerr", image)
                 # cv2.waitKey(1)
 
             previous_image = np.clip(current_state.image.copy(), a_min=0., a_max=1.)
@@ -95,16 +95,9 @@ def main():
 
         print("train total reward {a}".format(a=sum_reward * 255))
 
-    torch.save(model.state_dict(),f'./torch_pixel_model/pixel_sig{SIGMA}_color_individual_c.pth')
-    print(f'Saved model to ./torch_pixel_model/pixel_sig{SIGMA}_color_individual_c.pth')
+    torch.save(model.state_dict(),f'pixel_sig{SIGMA}_color_individual_c.pth')
+    print(f'Saved model to pixel_sig{SIGMA}_color_individual_c.pth')
     
-def paint_amap(acmap):
-    image = np.asanyarray(acmap.squeeze(), dtype=np.uint8)
-    # print(image)
-    plt.imshow(image, vmin=1, vmax=9)
-    plt.colorbar()
-    plt.pause(1)
-    # plt.show()
-    plt.close()
+
 if __name__ == '__main__':
     main()
