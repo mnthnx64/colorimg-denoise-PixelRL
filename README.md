@@ -9,8 +9,8 @@ Class project for EEE 598 (Reninforcement Learning in Robotics)
 
 
 # Requirements and Dependencies
-- pytorch
 - python 3.5+
+- python dependencies are in requirements.txt
 
 
 
