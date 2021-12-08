@@ -3,6 +3,10 @@ import numpy as np
 import cv2
 import math
  
+"""
+Used to read in images for testing
+"""
+
 class TestBatchLoader(object):
  
     def __init__(self, img, crop_size, validation=False):

@@ -81,6 +81,9 @@ class PixelWiseA3C_InnerState():
                 else:
                     target_params[param_name].grad[...] = param.grad
 
+    """
+    Update reward, advantage and loss coeficients
+    """
     def update(self, statevar):
         assert self.t_start < self.t
         if statevar is None:
@@ -130,6 +133,9 @@ class PixelWiseA3C_InnerState():
 
         self.t_start = self.t
 
+    """
+    Take an action and backpropagate results
+    """
     def act_and_train(self, state, reward):
         statevar = torch.Tensor(state).cuda()
         self.past_rewards[self.t - 1] = torch.Tensor(reward).cuda()
@@ -154,7 +160,9 @@ class PixelWiseA3C_InnerState():
 
         return action.squeeze(1).detach().cpu(), inner_state.detach().cpu(), action_prob.squeeze(1).detach().cpu()
 
-
+    """
+    Stop  current episode and backpropagate rewards
+    """
     def stop_episode_and_train(self, state, reward, done=False):
         self.past_rewards[self.t - 1] = torch.Tensor(reward).cuda()
         if done:
@@ -162,7 +170,9 @@ class PixelWiseA3C_InnerState():
         else:
             statevar = state
             self.update(statevar)
-
+    """
+    Take an action only - no backpropagation
+    """
     def act(self, state, test=True):
         with torch.no_grad():
             statevar = torch.Tensor(state).cuda()

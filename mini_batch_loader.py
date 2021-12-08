@@ -2,6 +2,9 @@ import os
 import numpy as np
 import cv2
  
+ """
+ Fetches batches of pictures, splits them into patches and performs data augmentation on the patches
+ """
  
 class MiniBatchLoader(object):
  
@@ -87,14 +90,6 @@ class MiniBatchLoader(object):
         elif mini_batch_size == 0:
             xs = np.zeros((1, in_channels, self.crop_size, self.crop_size)).astype(np.float32)
             img = cv2.imread(self.validation_infos,1)
-
-            # cv2.imshow('pre',img)
-
-            # oof = (img/255).astype(np.float32)
-            # unoof = (oof*255).astype(np.uint8)
-
-            # cv2.imshow('post',unoof)
-            # cv2.waitKey(0)
             
             if img is None:
                 raise RuntimeError("invalid image: {i}".format(i=self.validation_infos))
@@ -108,9 +103,6 @@ class MiniBatchLoader(object):
             img = img[y_offset:y_offset+self.crop_size, x_offset:x_offset+self.crop_size]
 
             xs[0, :, :, :] = (img/255).astype(np.float32).reshape(c,self.crop_size,self.crop_size)
-
-            # cv2.imshow('post',(xs[0]*255).astype(np.uint8).reshape(63,63,3))
-            # cv2.waitKey(0)
 
         else:
             raise RuntimeError("mini batch size must be 1 when testing")

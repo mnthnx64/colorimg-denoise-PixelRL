@@ -41,6 +41,9 @@ class State():
             cv_dims = (h, w, c)
             std_dims = (c, h, w)
 
+            """
+            Filter actions
+            """
             if np.sum(act[i] == self.move_range) > 0:
                 gaussian[i] = np.expand_dims(cv2.GaussianBlur(self.image[i].squeeze().reshape(cv_dims).astype(np.float32), ksize=(5, 5),
                                                               sigmaX=0.5), 0).reshape(std_dims)
@@ -65,7 +68,7 @@ class State():
                     cv2.boxFilter(self.image[i].squeeze().reshape(cv_dims).astype(np.float32), ddepth=-1, ksize=(5, 5)), 0).reshape(std_dims)
                 # print("box")
             """
-            The Color channel optimization should go here
+            Color channel optimization actions
             """
             if np.sum(act[i] == self.move_range + 6) > 0:
                 new_img = self.image[i].squeeze()
@@ -114,6 +117,9 @@ class State():
                 b_min[i] = np.expand_dims(new_img,0)
                 # print('b-')
 
+        """
+        Apply actions to the image
+        """
         if self.image.shape[0] > 1:
             self.image = np.where(act[:,np.newaxis,:,:]==self.move_range, gaussian, self.image)
             self.image = np.where(act[:,np.newaxis,:,:]==self.move_range+1, bilateral, self.image)

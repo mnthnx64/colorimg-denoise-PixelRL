@@ -4,6 +4,21 @@ Class project for EEE 598 (Reninforcement Learning in Robotics)
 
 - Action sets are written in State.py
 - FCN extended to accept color images
+
+# Training
+- To train, open a terimnal in the project folder and run
+```
+python Train_torch.py
+```
+
+# Testing
+- To run inference, open a terimnal in the project folder and run
+```
+python Tst.py
+```
+
+
+# Demo
 - Website to test code: [link](https://mnthnx64.github.io/image-transceiver/)
 
 

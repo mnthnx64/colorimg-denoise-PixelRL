@@ -23,14 +23,13 @@ LR = 1e-3
 IMG_SIZE = 70
 SIGMA = 50
 N_CHANNELS = 3
-# TRAINING_DATA_PATH = "./train.txt"
-# TESTING_DATA_PATH = "./train.txt"
 TRAINING_DATA_PATH = "./CBSD68.txt"
 TESTING_DATA_PATH = "./CBSD68.txt"
 IMAGE_DIR_PATH = ".//"
 
 def main():
     model = PPO(N_ACTIONS).to(device)
+    # Only uncomment if you want transfer learning
     # model.load_state_dict(torch.load("./torch_initweight/sig25_gray.pth"))
     optimizer = optim.Adam(model.parameters(), lr=LR)
     i_index = 0

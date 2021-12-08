@@ -6,10 +6,14 @@ import math
 import torch.optim as optim
 torch.manual_seed(1)
 
+# Define the FCN
 class PPO(nn.Module):
     def __init__(self, Action_N):
         super(PPO, self).__init__()
         self.action_n = Action_N
+        """
+        Shared convolutional layers
+        """
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels=3, out_channels=64, kernel_size=3, stride=1, padding=(1, 1), bias=True),
             nn.ReLU(),
@@ -20,18 +24,28 @@ class PPO(nn.Module):
             nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(4, 4), dilation=4, bias=True),
             nn.ReLU(),
         )
+
+        """
+        Actor (Policy) specific convolutional layers
+        """
         self.diconv1_p = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(3, 3), dilation=3,
                                    bias=True)
         self.diconv2_p = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(2, 2), dilation=2,
                                    bias=True)
         self.policy = nn.Conv2d(in_channels=64, out_channels=self.action_n, kernel_size=3, stride=1, padding=(1, 1), bias=True)
 
+        """
+        Critic (Value) specific convolutional layers
+        """
         self.diconv1_v = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(3, 3), dilation=3,
                                    bias=True)
         self.diconv2_v = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(2, 2), dilation=2,
                                    bias=True)
         self.value = nn.Conv2d(in_channels=64, out_channels=3, kernel_size=3, stride=1, padding=(1, 1), bias=True)
 
+        """
+        Convolutional layers for GRU
+        """
         self.conv7_Wz = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(1, 1), bias=False)
         self.conv7_Uz = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(1, 1), bias=False)
         self.conv7_Wr = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=(1, 1), bias=False)
