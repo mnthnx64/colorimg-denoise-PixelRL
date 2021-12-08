@@ -3,14 +3,14 @@ The PixelRL Denoiser for colored images
 Class project for EEE 598 (Reninforcement Learning in Robotics) 
 
 - Action sets are written in State.py
-- FCN needs to be extended to accept 3 channeled images
-- bilateral filter has some issues with colored images (probably dimensionality and dtype)
+- FCN extended to accept color images
+- Website to test code: [link](https://mnthnx64.github.io/image-transceiver/)
 
 
 
 # Requirements and Dependencies
-- pytorch
 - python 3.5+
+- python dependencies are in requirements.txt
 
 
 
@@ -35,6 +35,3 @@ Please quote the original paper [PixelRL](https://arxiv.org/abs/1811.04323).
     pages={1704-1719}
 }
 ```
-
-
-
